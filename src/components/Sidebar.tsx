@@ -19,10 +19,11 @@ interface SidebarProps {
 }
 
 interface SearchResult {
-  place_id: number;
-  display_name: string;
-  lat: string;
-  lon: string;
+  id: string | number;
+  name: string;
+  context: string;
+  lat: number;
+  lng: number;
 }
 
 export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onResetView }: SidebarProps) {
@@ -33,21 +34,32 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
-      if (searchTerm.trim().length > 2) {
+      if (searchTerm.trim().length >= 2) {
         setIsLoading(true);
         try {
-          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchTerm)}&limit=10&addressdetails=1&accept-language=en`);
+          const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=10`);
           const data = await response.json();
-          const uniqueResults = data.reduce((acc: SearchResult[], current: any) => {
-            const name = current.display_name.split(',')[0].toLowerCase();
-            if (!acc.find((item: any) => item.display_name.split(',')[0].toLowerCase() === name)) acc.push(current);
+          const mappedResults: SearchResult[] = data.features.map((f: any, index: number) => {
+            const p = f.properties;
+            const name = p.name || '';
+            const context = [p.city, p.state, p.country].filter(Boolean).join(', ');
+            return {
+              id: `${p.osm_id || index}-${index}`,
+              name: name,
+              context: context,
+              lat: f.geometry.coordinates[1],
+              lng: f.geometry.coordinates[0],
+            };
+          });
+          const uniqueResults = mappedResults.reduce((acc: SearchResult[], current) => {
+            if (!acc.find(item => item.name.toLowerCase() === current.name.toLowerCase() && item.context.toLowerCase() === current.context.toLowerCase()) && current.name) acc.push(current);
             return acc;
           }, []).slice(0, 5);
           setResults(uniqueResults);
         } catch (error) { console.error('Search error:', error); }
         finally { setIsLoading(false); }
       } else { setResults([]); }
-    }, 400);
+    }, 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
 
@@ -85,9 +97,9 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   const handleAddStop = (res: SearchResult) => {
     onAddStop({
       id: Math.random().toString(36).substr(2, 9),
-      name: res.display_name.split(',')[0],
-      lat: parseFloat(res.lat),
-      lng: parseFloat(res.lon),
+      name: res.name,
+      lat: res.lat,
+      lng: res.lng,
     });
     setSearchTerm('');
     setResults([]);
@@ -135,11 +147,11 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           {results.length > 0 && (
             <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: 'white', border: '1px solid #eee', borderRadius: '12px', marginTop: '0.5rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 100, maxHeight: '300px', overflowY: 'auto' }}>
               {results.map(res => (
-                <button key={res.place_id} onClick={() => handleAddStop(res)} style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}>
+                <button key={res.id} onClick={() => handleAddStop(res)} style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}>
                   <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px' }}><MapPin size={16} color="var(--primary-navy)" /></div>
                   <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--primary-navy)' }}>{res.display_name.split(',')[0]}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.display_name.split(',').slice(1).join(',').trim()}</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--primary-navy)' }}>{res.name}</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.context}</span>
                   </div>
                   <Plus size={14} color="#cbd5e1" />
                 </button>
@@ -150,6 +162,13 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
+        {stops.length === 0 && (
+          <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <MapPin size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+            <p>Search for a place to start your itinerary.</p>
+          </div>
+        )}
+
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="itinerary">
             {(provided) => (
@@ -169,9 +188,8 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
                           boxShadow: snapshot.isDragging ? '0 8px 25px rgba(0,0,0,0.1)' : 'none',
                         }}
                       >
-                        {/* Transport selection ALWAYS visible before stop (except first) */}
                         {index > 0 && (
-                          <div className="transport-connector" style={{ height: '3rem', position: 'relative', left: '53px', width: '2px', background: '#e2e8f0', margin: '0' }}>
+                          <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '53px', width: '2px', background: '#e2e8f0', margin: '0' }}>
                             <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', display: 'flex', gap: '4px', padding: '4px', background: 'white', borderRadius: '20px', border: '1px solid #eee', boxShadow: 'var(--shadow)', zIndex: 10 }}>
                               {modes.map(m => (
                                 <button key={m} onClick={() => onUpdateLegMode(stops[index-1].id, stop.id, m)} style={{ padding: '6px', borderRadius: '50%', display: 'flex', background: legs.find(l => l.toId === stop.id)?.mode === m ? 'var(--primary-navy)' : 'transparent', color: legs.find(l => l.toId === stop.id)?.mode === m ? 'white' : 'var(--text-muted)' }}>
@@ -206,11 +224,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           </Droppable>
         </DragDropContext>
       </div>
-      
-      <style jsx>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-      `}</style>
     </div>
   );
 }

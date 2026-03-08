@@ -50,6 +50,8 @@ button {
 
 .sidebar {
   width: 400px;
+  min-width: 400px; /* Force minimum width */
+  flex-shrink: 0;   /* Prevent shrinking in flex container */
   height: 100vh;
   background-color: var(--white);
   box-shadow: 4px 0 10px rgba(0,0,0,0.05);
@@ -152,4 +154,15 @@ button {
 
 .zoom-button:active {
   transform: translateY(0);
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+  display: block;
 }
