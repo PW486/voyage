@@ -11,10 +11,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 interface MapViewProps {
   stops: Stop[];
   legs: Leg[];
-  resetTrigger?: number;
 }
 
-// Fix for default marker icons
 if (typeof window !== 'undefined') {
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -23,30 +21,26 @@ if (typeof window !== 'undefined') {
   });
 }
 
-function MapContent({ stops, legs, resetTrigger }: MapViewProps) {
+function MapContent({ stops, legs }: MapViewProps) {
   const map = useMap();
   const [isReady, setIsLoaded] = useState(false);
 
-  // Signal that map instance is ready
   useEffect(() => {
     if (map) setIsLoaded(true);
   }, [map]);
 
-  const stopsKey = useMemo(() => 
-    stops.map(s => `${s.id}-${s.lat}-${s.lng}`).join('|'), 
-  [stops]);
+  const stopsKey = useMemo(() => stops.map(s => `${s.id}-${s.lat}-${s.lng}`).join('|'), [stops]);
 
-  // Handle auto-zoom and reset view
   useEffect(() => {
     if (!isReady || stops.length === 0) return;
-
+    
     if (stops.length === 1) {
       map.setView([stops[0].lat, stops[0].lng], 12, { animate: true });
     } else {
       const bounds = L.latLngBounds(stops.map(s => [s.lat, s.lng]));
       map.fitBounds(bounds, { padding: [80, 80], animate: true });
     }
-  }, [stopsKey, resetTrigger, isReady, map]);
+  }, [stopsKey, isReady, map]);
 
   const getTransportIconMarkup = (mode: TransportMode) => {
     const icons = {
@@ -59,12 +53,7 @@ function MapContent({ stops, legs, resetTrigger }: MapViewProps) {
       WALK: <Footprints size={14} />,
     };
     return renderToStaticMarkup(
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        width: '24px', height: '24px', background: 'white',
-        border: '2px solid #334155', borderRadius: '50%',
-        color: '#334155', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', boxSizing: 'border-box'
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', background: 'white', border: '2px solid #334155', borderRadius: '50%', color: '#334155', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
         {icons[mode] || icons.PLANE}
       </div>
     );
@@ -84,7 +73,7 @@ function MapContent({ stops, legs, resetTrigger }: MapViewProps) {
         <Marker 
           key={`marker-${stop.id}-${index}`}
           position={[stop.lat, stop.lng]} 
-          interactive={false} // Disable all mouse events (clicks, etc.)
+          interactive={false}
           icon={L.divIcon({
             className: 'custom-marker-container',
             html: `<div class="marker-wrapper"><div class="marker-label">${stop.name}</div><div class="marker-number">${index + 1}</div></div>`,
@@ -98,22 +87,23 @@ function MapContent({ stops, legs, resetTrigger }: MapViewProps) {
         const to = stops.find(s => s.id === leg.toId);
         if (!from || !to) return null;
 
-        const coords: [number, number][] = [[from.lat, from.lng], [to.lat, to.lng]];
         const midpoint: [number, number] = [(from.lat + to.lat) / 2, (from.lng + to.lng) / 2];
 
         return (
           <Fragment key={`leg-group-${idx}-${leg.fromId}-${leg.toId}`}>
-            <Polyline positions={coords} color="#334155" weight={3} opacity={0.8} />
-            <Marker 
-              position={midpoint} 
-              interactive={false}
-              icon={L.divIcon({
-                className: 'transport-marker-icon',
-                html: getTransportIconMarkup(leg.mode),
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
-              })}
-            />
+            <Polyline positions={[[from.lat, from.lng], [to.lat, to.lng]]} color="#334155" weight={3} opacity={1} />
+            {!leg.isReturn && (
+              <Marker 
+                position={midpoint} 
+                interactive={false}
+                icon={L.divIcon({
+                  className: 'transport-marker-icon',
+                  html: getTransportIconMarkup(leg.mode),
+                  iconSize: [24, 24],
+                  iconAnchor: [12, 12]
+                })}
+              />
+            )}
           </Fragment>
         );
       })}
@@ -127,17 +117,9 @@ function MapContent({ stops, legs, resetTrigger }: MapViewProps) {
 }
 
 export default function MapView(props: MapViewProps) {
-  const defaultCenter: [number, number] = [48.8566, 2.3522];
-
   return (
     <div className="map-container">
-      <MapContainer 
-        center={defaultCenter} 
-        zoom={5} 
-        scrollWheelZoom={true} 
-        zoomControl={false}
-        style={{ height: '100%', width: '100%' }}
-      >
+      <MapContainer center={[48.8566, 2.3522]} zoom={5} scrollWheelZoom={true} zoomControl={false} style={{ height: '100%', width: '100%' }}>
         <MapContent {...props} />
       </MapContainer>
     </div>

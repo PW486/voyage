@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import Sidebar from '@/components/Sidebar';
 import { Stop, Leg, TransportMode } from '@/types';
 
-// Dynamically import MapView to avoid SSR issues with Leaflet
 const MapView = dynamic(() => import('@/components/MapView'), { 
   ssr: false,
   loading: () => <div style={{ height: '100vh', width: '100%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading Map...</div>
@@ -15,9 +14,7 @@ export default function Home() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [legs, setLegs] = useState<Leg[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [resetTrigger, setResetTrigger] = useState(0);
 
-  // Load from LocalStorage on mount
   useEffect(() => {
     const savedStops = localStorage.getItem('voyage_stops');
     const savedLegs = localStorage.getItem('voyage_legs');
@@ -26,7 +23,6 @@ export default function Home() {
     setIsLoaded(true);
   }, []);
 
-  // Save to LocalStorage whenever state changes
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('voyage_stops', JSON.stringify(stops));
@@ -36,61 +32,61 @@ export default function Home() {
 
   const handleAddStop = (newStop: Stop) => {
     setStops(prev => {
-      const updated = [...prev, newStop];
-      if (prev.length > 0) {
-        const lastStop = prev[prev.length - 1];
-        setLegs(currentLegs => [
-          ...currentLegs,
-          { fromId: lastStop.id, toId: newStop.id, mode: 'PLANE' }
-        ]);
-      }
+      const updated = [...prev, { ...newStop, tripType: 'ONE_WAY' }];
+      rebuildLegs(updated);
       return updated;
     });
   };
 
   const handleRemoveStop = (id: string) => {
     setStops(prev => {
-      const index = prev.findIndex(s => s.id === id);
       const updated = prev.filter(s => s.id !== id);
-      
-      setLegs(currentLegs => {
-        let newLegs = currentLegs.filter(l => l.fromId !== id && l.toId !== id);
-        if (index > 0 && index < prev.length - 1) {
-          const prevStop = prev[index - 1];
-          const nextStop = prev[index + 1];
-          newLegs.push({ fromId: prevStop.id, toId: nextStop.id, mode: 'PLANE' });
-        }
-        return newLegs;
-      });
-      
+      rebuildLegs(updated);
       return updated;
     });
   };
 
-  const handleUpdateLegMode = (fromId: string, toId: string, mode: TransportMode) => {
+  const handleUpdateLegMode = (toId: string, mode: TransportMode) => {
     setLegs(prev => prev.map(l => 
-      (l.fromId === fromId && l.toId === toId) ? { ...l, mode } : l
+      (l.toId === toId || (l.fromId === toId && l.isReturn)) ? { ...l, mode } : l
     ));
+  };
+
+  const handleToggleTripType = (id: string) => {
+    setStops(prev => {
+      const updated = prev.map(s => s.id === id ? { ...s, tripType: s.tripType === 'ROUND_TRIP' ? 'ONE_WAY' : 'ROUND_TRIP' } : s);
+      rebuildLegs(updated);
+      return updated;
+    });
+  };
+
+  const rebuildLegs = (currentStops: Stop[]) => {
+    const newLegs: Leg[] = [];
+    if (currentStops.length < 2) {
+      setLegs([]);
+      return;
+    }
+
+    let currentBaseStop = currentStops[0];
+    for (let i = 1; i < currentStops.length; i++) {
+      const targetStop = currentStops[i];
+      const existingLeg = legs.find(l => l.toId === targetStop.id && !l.isReturn);
+      const mode = existingLeg ? existingLeg.mode : 'PLANE';
+
+      newLegs.push({ fromId: currentBaseStop.id, toId: targetStop.id, mode });
+
+      if (targetStop.tripType === 'ROUND_TRIP') {
+        newLegs.push({ fromId: targetStop.id, toId: currentBaseStop.id, mode, isReturn: true });
+      } else {
+        currentBaseStop = targetStop;
+      }
+    }
+    setLegs(newLegs);
   };
 
   const handleReorderStops = (newStops: Stop[]) => {
     setStops(newStops);
-    // Rebuild legs based on new order, preserving the mode used to arrive at each destination
-    setLegs(prevLegs => {
-      const newLegs: Leg[] = [];
-      for (let i = 0; i < newStops.length - 1; i++) {
-        const fromId = newStops[i].id;
-        const toId = newStops[i + 1].id;
-        // Find if there was a mode previously associated with getting TO this specific destination
-        const existingLeg = prevLegs.find(l => l.toId === toId);
-        newLegs.push({
-          fromId,
-          toId,
-          mode: existingLeg ? existingLeg.mode : 'PLANE'
-        });
-      }
-      return newLegs;
-    });
+    rebuildLegs(newStops);
   };
 
   const handleClearAll = () => {
@@ -98,10 +94,6 @@ export default function Home() {
       setStops([]);
       setLegs([]);
     }
-  };
-
-  const triggerResetView = () => {
-    setResetTrigger(prev => prev + 1);
   };
 
   return (
@@ -114,9 +106,9 @@ export default function Home() {
         onUpdateLegMode={handleUpdateLegMode}
         onReorderStops={handleReorderStops}
         onClearAll={handleClearAll}
-        onResetView={triggerResetView}
+        onToggleTripType={handleToggleTripType}
       />
-      <MapView stops={stops} legs={legs} resetTrigger={resetTrigger} />
+      <MapView stops={stops} legs={legs} />
     </main>
   );
 }

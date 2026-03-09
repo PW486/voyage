@@ -68,7 +68,6 @@ button {
 
 .transport-connector {
   position: relative;
-  left: 53px; /* Aligned with number center */
   height: 40px;
   width: 2px;
   background: #e2e8f0;
