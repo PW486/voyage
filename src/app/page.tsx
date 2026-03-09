@@ -32,7 +32,7 @@ export default function Home() {
 
   const handleAddStop = (newStop: Stop) => {
     setStops(prev => {
-      const updated = [...prev, { ...newStop, tripType: 'ONE_WAY' }];
+      const updated: Stop[] = [...prev, { ...newStop, tripType: 'ONE_WAY' }];
       rebuildLegs(updated);
       return updated;
     });
@@ -54,7 +54,7 @@ export default function Home() {
 
   const handleToggleTripType = (id: string) => {
     setStops(prev => {
-      const updated = prev.map(s => s.id === id ? { ...s, tripType: s.tripType === 'ROUND_TRIP' ? 'ONE_WAY' : 'ROUND_TRIP' } : s);
+      const updated: Stop[] = prev.map(s => s.id === id ? { ...s, tripType: s.tripType === 'ROUND_TRIP' ? 'ONE_WAY' : 'ROUND_TRIP' } : s);
       rebuildLegs(updated);
       return updated;
     });
