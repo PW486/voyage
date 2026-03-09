@@ -28,13 +28,14 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchTerm.trim().length >= 2) {
         setIsLoading(true);
         try {
-          const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=10`);
+          const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=10&lang=en`);
           const data = await response.json();
           const mappedResults: SearchResult[] = data.features.map((f: any, index: number) => {
             const p = f.properties;
@@ -89,29 +90,27 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   return (
     <div className="sidebar">
       <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Plane size={24} color="var(--primary-navy)" fill="var(--primary-navy)" />
-            <h1 style={{ color: 'var(--primary-navy)', fontSize: '1.5rem', margin: 0 }}>Bon Voyage</h1>
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', minHeight: '38px' }}>
+          <h1 style={{ color: 'var(--primary-navy)', fontSize: '1.5rem', margin: 0 }}>Bon Voyage</h1>
+          <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
             {stops.length > 0 && (
               <button 
                 onClick={onClearAll} 
                 style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.5rem', 
-                  padding: '0.5rem 1rem', 
+                  gap: '0.4rem', 
+                  padding: '0.4rem 0.8rem', 
                   borderRadius: '8px', 
                   background: '#fff1f0', 
                   color: '#ff4d4f', 
-                  fontSize: '0.9rem', 
-                  fontWeight: 500, 
-                  border: '1px solid #ffccc7' 
+                  fontSize: '0.85rem', 
+                  fontWeight: 600, 
+                  border: '1px solid #ffccc7',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <RotateCcw size={16} />
+                <RotateCcw size={14} />
                 <span>Reset</span>
               </button>
             )}
@@ -121,9 +120,33 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '12px', padding: '0 0.75rem' }}>
             {isLoading ? <Loader2 size={18} className="animate-spin" color="var(--text-muted)" /> : <Search size={18} color="var(--text-muted)" />}
-            <input type="text" placeholder="Search destination..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ width: '100%', padding: '0.75rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} />
+            <input 
+              type="text" 
+              placeholder="Add a destination..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+              style={{ width: '100%', padding: '0.75rem', paddingRight: '2rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} 
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm('')} 
+                style={{ 
+                  position: 'absolute', 
+                  right: '0.75rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  color: '#cbd5e1',
+                  padding: '4px'
+                }}
+              >
+                <Plus size={18} style={{ transform: 'rotate(45deg)' }} />
+              </button>
+            )}
           </div>
-          {results.length > 0 && (
+          {isFocused && results.length > 0 && (
             <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: 'white', border: '1px solid #eee', borderRadius: '12px', marginTop: '0.5rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 100 }}>
               {results.map(res => (
                 <button key={res.id} onClick={() => handleAddStop(res)} style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}>
@@ -144,7 +167,8 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         {stops.length === 0 ? (
           <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
             <MapPin size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-            <p>Search for a place to start your itinerary.</p>
+            <p>Ready to plan your next adventure?</p>
+            <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Search for a place to start.</p>
           </div>
         ) : (
           <DragDropContext onDragEnd={onDragEnd}>

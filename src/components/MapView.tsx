@@ -109,8 +109,26 @@ function MapContent({ stops, legs }: MapViewProps) {
       })}
 
       <div className="custom-zoom-control">
-        <button className="zoom-button" onClick={() => map.zoomIn()}><Plus size={20} /></button>
-        <button className="zoom-button" onClick={() => map.zoomOut()}><Minus size={20} /></button>
+        <button 
+          className="zoom-button" 
+          onClick={(e) => {
+            e.stopPropagation();
+            map.zoomIn();
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <Plus size={20} />
+        </button>
+        <button 
+          className="zoom-button" 
+          onClick={(e) => {
+            e.stopPropagation();
+            map.zoomOut();
+          }}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <Minus size={20} />
+        </button>
       </div>
     </>
   );
@@ -119,7 +137,14 @@ function MapContent({ stops, legs }: MapViewProps) {
 export default function MapView(props: MapViewProps) {
   return (
     <div className="map-container">
-      <MapContainer center={[48.8566, 2.3522]} zoom={5} scrollWheelZoom={true} zoomControl={false} style={{ height: '100%', width: '100%' }}>
+      <MapContainer 
+        center={[40.7128, -74.0060]} 
+        zoom={11} 
+        scrollWheelZoom={true} 
+        zoomControl={false} 
+        doubleClickZoom={false}
+        style={{ height: '100%', width: '100%' }}
+      >
         <MapContent {...props} />
       </MapContainer>
     </div>

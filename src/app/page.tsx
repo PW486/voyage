@@ -90,7 +90,7 @@ export default function Home() {
   };
 
   const handleClearAll = () => {
-    if (confirm('Are you sure you want to clear your entire itinerary?')) {
+    if (confirm('Are you sure you want to clear your journey?')) {
       setStops([]);
       setLegs([]);
     }
