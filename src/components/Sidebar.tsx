@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Stop, Leg, TransportMode } from '@/types';
 import { MapPin, Plane, Train, Car, Bus, Footprints, Plus, Search, Trash2, Loader2, Ship, Bike, RotateCcw, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -52,9 +52,14 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
             return acc;
           }, []).slice(0, 5);
           setResults(uniqueResults);
-        } catch (error) { console.error('Search error:', error); }
-        finally { setIsLoading(false); }
-      } else { setResults([]); }
+        } catch (error) {
+          console.error('Search error:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setResults([]);
+      }
     }, 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
@@ -73,17 +78,18 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     setResults([]);
   };
 
-  const getTransportIcon = (mode: TransportMode) => {
+  const getTransportIcon = useCallback((mode: TransportMode) => {
+    const size = 14;
     switch (mode) {
-      case 'TRAIN': return <Train size={14} />;
-      case 'BUS': return <Bus size={14} />;
-      case 'FERRY': return <Ship size={14} />;
-      case 'CAR': return <Car size={14} />;
-      case 'BIKE': return <Bike size={14} />;
-      case 'WALK': return <Footprints size={14} />;
-      default: return <Plane size={14} />;
+      case 'PLANE': return <Plane size={size} />;
+      case 'TRAIN': return <Train size={size} />;
+      case 'BUS': return <Bus size={size} />;
+      case 'FERRY': return <Ship size={size} />;
+      case 'CAR': return <Car size={size} />;
+      case 'BIKE': return <Bike size={size} />;
+      case 'WALK': return <Footprints size={size} />;
     }
-  };
+  }, []);
 
   const modes: TransportMode[] = ['PLANE', 'TRAIN', 'BUS', 'FERRY', 'CAR', 'BIKE', 'WALK'];
 
@@ -182,11 +188,24 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
                           {index > 0 && (
                             <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '37px', width: '2px', background: '#e2e8f0', margin: '0' }}>
                               <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', display: 'flex', gap: '4px', padding: '4px', background: 'white', borderRadius: '20px', border: '1px solid #eee', boxShadow: 'var(--shadow)', zIndex: 10 }}>
-                                {modes.map(m => (
-                                  <button key={m} onClick={() => onUpdateLegMode(stop.id, m)} style={{ padding: '6px', borderRadius: '50%', display: 'flex', background: legs.find(l => l.toId === stop.id && !l.isReturn)?.mode === m ? 'var(--primary-navy)' : 'transparent', color: legs.find(l => l.toId === stop.id && !l.isReturn)?.mode === m ? 'white' : 'var(--text-muted)' }}>
-                                    {getTransportIcon(m)}
-                                  </button>
-                                ))}
+                                {modes.map(m => {
+                                  const isActive = legs.find(l => l.toId === stop.id && !l.isReturn)?.mode === m;
+                                  return (
+                                    <button 
+                                      key={m} 
+                                      onClick={() => onUpdateLegMode(stop.id, m)} 
+                                      style={{ 
+                                        padding: '6px', 
+                                        borderRadius: '50%', 
+                                        display: 'flex', 
+                                        background: isActive ? 'var(--primary-navy)' : 'transparent', 
+                                        color: isActive ? 'white' : 'var(--text-muted)' 
+                                      }}
+                                    >
+                                      {getTransportIcon(m)}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}

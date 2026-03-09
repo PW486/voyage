@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet
 import 'leaflet/dist/leaflet.css';
 import { Stop, Leg, TransportMode } from '@/types';
 import L from 'leaflet';
-import { useEffect, useMemo, Fragment, useState } from 'react';
+import { useEffect, useMemo, Fragment } from 'react';
 import { Plus, Minus, Plane, Train, Bus, Ship, Car, Bike, Footprints } from 'lucide-react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -23,16 +23,11 @@ if (typeof window !== 'undefined') {
 
 function MapContent({ stops, legs }: MapViewProps) {
   const map = useMap();
-  const [isReady, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    if (map) setIsLoaded(true);
-  }, [map]);
 
   const stopsKey = useMemo(() => stops.map(s => `${s.id}-${s.lat}-${s.lng}`).join('|'), [stops]);
 
   useEffect(() => {
-    if (!isReady || stops.length === 0) return;
+    if (stops.length === 0) return;
     
     if (stops.length === 1) {
       map.setView([stops[0].lat, stops[0].lng], 12, { animate: true });
@@ -40,7 +35,7 @@ function MapContent({ stops, legs }: MapViewProps) {
       const bounds = L.latLngBounds(stops.map(s => [s.lat, s.lng]));
       map.fitBounds(bounds, { padding: [80, 80], animate: true });
     }
-  }, [stopsKey, isReady, map]);
+  }, [stopsKey, map, stops]);
 
   const getTransportIconMarkup = (mode: TransportMode) => {
     const icons = {
@@ -54,12 +49,10 @@ function MapContent({ stops, legs }: MapViewProps) {
     };
     return renderToStaticMarkup(
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', background: 'white', border: '2px solid #334155', borderRadius: '50%', color: '#334155', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
-        {icons[mode] || icons.PLANE}
+        {icons[mode]}
       </div>
     );
   };
-
-  if (!isReady) return null;
 
   return (
     <>
