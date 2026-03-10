@@ -14,7 +14,24 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Bon Voyage",
-  description: "Simple Travel Itinerary Planner",
+  description: "Plan your next adventure with ease. A simple and intuitive travel itinerary planner.",
+  keywords: ["travel", "itinerary", "planner", "trip", "voyage", "map", "navigation"],
+  authors: [{ name: "Bon Voyage Team" }],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/apple-icon.png",
+  },
+  openGraph: {
+    title: "Bon Voyage",
+    description: "Simple Travel Itinerary Planner",
+    type: "website",
+    siteName: "Bon Voyage",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bon Voyage",
+    description: "Simple Travel Itinerary Planner",
+  },
 };
 
 export const viewport: Viewport = {
