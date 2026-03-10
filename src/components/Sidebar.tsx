@@ -63,7 +63,7 @@ export default function Sidebar({
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
         switch (lvl) {
-          case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
+          case 0: return '28px';
           case 1: return '137px';
           case 2: return '70svh';
           default: return '137px';
@@ -175,7 +175,7 @@ export default function Sidebar({
 
   const getLevelHeightString = (lvl: number) => {
     switch (lvl) {
-      case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
+      case 0: return '28px';
       case 1: return '137px';
       case 2: return '70svh';
       default: return '137px';

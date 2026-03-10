@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     capable: true,
   },
+  themeColor: "#ffffff",
   openGraph: {
     title: "Bon Voyage!",
     description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",

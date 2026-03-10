@@ -23,7 +23,7 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  background-color: var(--bg-light);
+  background-color: var(--white); /* Changed from bg-light to white for seamless safe area */
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
 }
