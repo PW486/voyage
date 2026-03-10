@@ -141,14 +141,14 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       const getVisibleHeight = (lvl: number) => {
         switch (lvl) {
           case 0: return '28px';
-          case 1: return '160px';
+          case 1: return '137px';
           case 2: return '70svh';
-          default: return '160px';
+          default: return '137px';
         }
       };
       const h = getVisibleHeight(level);
-      // Sync the CSS variable with the exact height used by the sidebar
-      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px + env(safe-area-inset-bottom, 0px))`);
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
+
     } else {
       document.documentElement.style.removeProperty('--sidebar-visible-height');
     }
@@ -159,9 +159,9 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   const getLevelHeightString = (lvl: number) => {
     switch (lvl) {
       case 0: return '28px';
-      case 1: return '160px';
+      case 1: return '137px';
       case 2: return '70svh';
-      default: return '160px';
+      default: return '137px';
     }
   };
 
@@ -172,7 +172,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       className={`sidebar level-${level}`}
       style={isMobile ? {
         transform: 'none',
-        height: `calc(${currentHeight} ${isMobile && level < 2 ? `- ${dragY}px` : ''} + env(safe-area-inset-bottom, 0px))`,
+        height: isMobile && level < 2 ? `calc(${currentHeight} - ${dragY}px)` : currentHeight,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         bottom: 0,
         top: 'auto',
@@ -190,12 +190,13 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           if (level < 2) onLevelChange(level + 1);
           else onLevelChange(1);
         }}
+        style={isMobile ? { height: level === 0 ? '100%' : '28px', minHeight: '28px' } : {}}
       >
         <div className="handle-bar" />
       </div>
       
-      <div style={{ padding: isMobile ? '0.75rem 1.25rem 1.5rem 1.25rem' : '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', minHeight: '38px' }}>
+      <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage</h1>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
             {stops.length > 0 && (
@@ -232,6 +233,9 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               onChange={(e) => setSearchTerm(e.target.value)} 
               onFocus={() => {
                 setIsFocused(true);
+                if (isMobile && level < 2) {
+                  onLevelChange(2);
+                }
               }}
               onBlur={() => {
                 if (!isMobile) {
@@ -240,7 +244,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               }}
               style={{ width: '100%', padding: '0.75rem', paddingRight: '2rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} 
             />
-            {(searchTerm || (isMobile && isFocused)) && (
+            {searchTerm && (
               <button 
                 onClick={() => {
                   setSearchTerm('');
@@ -271,9 +275,9 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
                     key={res.id} 
                     onClick={() => {
                       handleAddStop(res);
-                      setIsFocused(false); // Hide results after selection
+                      setIsFocused(false);
                     }} 
-                    style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}
+                    style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa', color: 'var(--text-dark)' }}
                   >
                     <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px' }}><MapPin size={16} color="var(--primary-navy)" /></div>
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
