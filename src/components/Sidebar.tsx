@@ -311,7 +311,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
                       {(provided, snapshot) => (
                         <div ref={provided.innerRef} {...provided.draggableProps} className="itinerary-item" style={{ ...provided.draggableProps.style, padding: '0 1rem', background: snapshot.isDragging ? 'white' : 'transparent', zIndex: snapshot.isDragging ? 100 : 1 }}>
                           {index > 0 && (
-                            <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '29px', width: '2px', background: '#e2e8f0', margin: '0' }}>
+                            <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '37px', width: '2px', background: '#e2e8f0', margin: '0' }}>
                               <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', display: 'flex', gap: '4px', padding: '4px', background: 'white', borderRadius: '20px', border: '1px solid #eee', boxShadow: 'var(--shadow)', zIndex: 10 }}>
                                 {modes.map(m => {
                                   const isActive = legs.find(l => l.toId === stop.id && !l.isReturn)?.mode === m;
@@ -334,12 +334,12 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
                               </div>
                             </div>
                           )}
-                          <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '0.5rem 0', background: 'white', borderRadius: '12px', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', position: 'relative', padding: '0.5rem 0', background: snapshot.isDragging ? 'white' : 'transparent', borderRadius: '12px', gap: '0.75rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', width: '50px', flexShrink: 0 }}>
                               <div {...provided.dragHandleProps} style={{ padding: '0.5rem 4px', color: '#cbd5e1', cursor: 'grab', display: 'flex', alignItems: 'center' }}><GripVertical size={18} /></div>
                               <div style={{ background: 'var(--primary-navy)', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold', flexShrink: 0 }}>{index + 1}</div>
                             </div>
-                            <div style={{ flex: 1, minWidth: 0 }}><h3 style={{ fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stop.name}</h3></div>
+                            <div style={{ flex: 1, minWidth: 0 }}><h3 style={{ fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-dark)' }}>{stop.name}</h3></div>
                             {index > 0 && (
                               <button 
                                 onClick={() => onToggleTripType(stop.id)} 
