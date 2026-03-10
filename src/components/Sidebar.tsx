@@ -147,7 +147,8 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         }
       };
       const h = getVisibleHeight(level);
-      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
+      // Sync the CSS variable with the total physical height of the sidebar
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px + env(safe-area-inset-bottom, 0px))`);
 
     } else {
       document.documentElement.style.removeProperty('--sidebar-visible-height');
