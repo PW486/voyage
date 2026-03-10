@@ -232,14 +232,8 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               onChange={(e) => setSearchTerm(e.target.value)} 
               onFocus={() => {
                 setIsFocused(true);
-                // On mobile, ensure we go to level 2 smoothly
-                if (isMobile && level < 2) {
-                  onLevelChange(2);
-                }
               }}
               onBlur={() => {
-                // Only hide results on desktop automatically
-                // On mobile, we want to keep them visible until a selection or manual close
                 if (!isMobile) {
                   setTimeout(() => setIsFocused(false), 200);
                 }

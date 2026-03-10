@@ -131,7 +131,7 @@ button {
   }
   
   .custom-zoom-control {
-    bottom: calc(var(--sidebar-visible-height, 28px) + 1rem) !important;
+    bottom: calc(var(--sidebar-visible-height, 28px) + 1.5rem) !important;
     right: calc(1rem + env(safe-area-inset-right)) !important;
     transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
