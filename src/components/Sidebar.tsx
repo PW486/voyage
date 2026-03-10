@@ -143,12 +143,12 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           case 0: return '28px';
           case 1: return '160px';
           case 2: return '70vh';
-          default: return '28px';
+          default: return '160px';
         }
       };
       const h = getVisibleHeight(level);
-      // Include safe area in the visible height calculation for map controls
-      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
+      // Sync the CSS variable with the exact height used by the sidebar
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px + env(safe-area-inset-bottom, 0px))`);
     } else {
       document.documentElement.style.removeProperty('--sidebar-visible-height');
     }
@@ -156,24 +156,21 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
 
   const modes: TransportMode[] = ['PLANE', 'TRAIN', 'BUS', 'FERRY', 'CAR', 'BIKE', 'WALK'];
 
-  const getLevelHeight = (lvl: number) => {
-    if (typeof window === 'undefined') return 160;
+  const getLevelHeightString = (lvl: number) => {
     switch (lvl) {
-      case 0: return 28;
-      case 1: return 160;
-      case 2: return Math.floor(window.innerHeight * 0.7);
-      default: return 160;
+      case 0: return '28px';
+      case 1: return '160px';
+      case 2: return '70vh';
+      default: return '160px';
     }
   };
-
-  const currentHeight = isMobile ? getLevelHeight(level) - dragY : '100%';
 
   return (
     <div 
       className={`sidebar level-${level}`}
       style={isMobile ? {
         transform: 'none',
-        height: `calc(${currentHeight}px + env(safe-area-inset-bottom, 0px))`,
+        height: `calc(${getLevelHeightString(level)} - ${dragY}px + env(safe-area-inset-bottom, 0px))`,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         bottom: 0,
         top: 'auto',
