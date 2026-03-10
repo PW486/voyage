@@ -195,7 +195,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         <div className="handle-bar" />
       </div>
       
-      <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
+      <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage</h1>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
@@ -304,13 +304,13 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="itinerary">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} style={{ padding: '1rem 0' }}>
+                <div {...provided.droppableProps} ref={provided.innerRef} style={{ padding: isMobile ? '0.5rem 0' : '1rem 0' }}>
                   {stops.map((stop, index) => (
                     <Draggable key={stop.id} draggableId={stop.id} index={index}>
                       {(provided, snapshot) => (
-                        <div ref={provided.innerRef} {...provided.draggableProps} className="itinerary-item" style={{ ...provided.draggableProps.style, padding: '0 1.5rem', background: snapshot.isDragging ? 'white' : 'transparent', zIndex: snapshot.isDragging ? 100 : 1 }}>
+                        <div ref={provided.innerRef} {...provided.draggableProps} className="itinerary-item" style={{ ...provided.draggableProps.style, padding: '0 1rem', background: snapshot.isDragging ? 'white' : 'transparent', zIndex: snapshot.isDragging ? 100 : 1 }}>
                           {index > 0 && (
-                            <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '37px', width: '2px', background: '#e2e8f0', margin: '0' }}>
+                            <div className="transport-connector" style={{ height: '2.5rem', position: 'relative', left: '29px', width: '2px', background: '#e2e8f0', margin: '0' }}>
                               <div style={{ position: 'absolute', top: '50%', left: '20px', transform: 'translateY(-50%)', display: 'flex', gap: '4px', padding: '4px', background: 'white', borderRadius: '20px', border: '1px solid #eee', boxShadow: 'var(--shadow)', zIndex: 10 }}>
                                 {modes.map(m => {
                                   const isActive = legs.find(l => l.toId === stop.id && !l.isReturn)?.mode === m;
