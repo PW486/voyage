@@ -14,6 +14,8 @@ interface SidebarProps {
   onReorderStops: (newStops: Stop[]) => void;
   onClearAll: () => void;
   onToggleTripType: (id: string) => void;
+  level: number;
+  onLevelChange: (level: number) => void;
 }
 
 interface SearchResult {
@@ -24,11 +26,44 @@ interface SearchResult {
   lng: number;
 }
 
-export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType }: SidebarProps) {
+export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType, level, onLevelChange }: SidebarProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Touch Drag State
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartY(e.touches[0].clientY);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+    setDragY(deltaY);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    // Snapping Logic
+    // If dragged enough (50px), move to next/prev level
+    if (Math.abs(dragY) > 50) {
+      if (dragY < -50 && level < 2) {
+        onLevelChange(level + 1);
+      } else if (dragY > 50 && level > 0) {
+        onLevelChange(level - 1);
+      }
+    }
+    setDragY(0);
+  };
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -76,6 +111,8 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     onAddStop({ id: Math.random().toString(36).substr(2, 9), name: res.name, lat: res.lat, lng: res.lng });
     setSearchTerm('');
     setResults([]);
+    // On mobile, if a stop is added, maybe keep sidebar open or closed? 
+    // Let's keep it open for now.
   };
 
   const getTransportIcon = useCallback((mode: TransportMode) => {
@@ -91,13 +128,69 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     }
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      const getVisibleHeight = (lvl: number) => {
+        switch (lvl) {
+          case 0: return '28px';
+          case 1: return '155px';
+          case 2: return '70vh';
+          default: return '28px';
+        }
+      };
+      const h = getVisibleHeight(level);
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
+    } else {
+      document.documentElement.style.removeProperty('--sidebar-visible-height');
+    }
+  }, [level, dragY, isMobile]);
+
   const modes: TransportMode[] = ['PLANE', 'TRAIN', 'BUS', 'FERRY', 'CAR', 'BIKE', 'WALK'];
 
+  const getLevelHeight = (lvl: number) => {
+    switch (lvl) {
+      case 0: return 28;
+      case 1: return 155;
+      case 2: return Math.floor(window.innerHeight * 0.7);
+      default: return 28;
+    }
+  };
+
   return (
-    <div className="sidebar">
-      <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
+    <div 
+      className={`sidebar level-${level}`}
+      style={isMobile ? {
+        transform: 'none',
+        height: `${getLevelHeight(level) - dragY}px`,
+        transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        bottom: 0,
+        top: 'auto'
+      } : {}}
+    >
+      <div 
+        className="mobile-handle" 
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={() => {
+          if (level < 2) onLevelChange(level + 1);
+          else onLevelChange(1);
+        }}
+      >
+        <div className="handle-bar" />
+      </div>
+      
+      <div style={{ padding: isMobile ? '0.75rem 1.25rem 1.5rem 1.25rem' : '2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', minHeight: '38px' }}>
-          <h1 style={{ color: 'var(--primary-navy)', fontSize: '1.5rem', margin: 0 }}>Bon Voyage</h1>
+          <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage</h1>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
             {stops.length > 0 && (
               <button 
@@ -131,7 +224,10 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               placeholder="Add a destination..." 
               value={searchTerm} 
               onChange={(e) => setSearchTerm(e.target.value)} 
-              onFocus={() => setIsFocused(true)}
+              onFocus={() => {
+                setIsFocused(true);
+                if (level < 2 && isMobile) onLevelChange(2); // 서치바 클릭 시 전체 확장
+              }}
               onBlur={() => setTimeout(() => setIsFocused(false), 200)}
               style={{ width: '100%', padding: '0.75rem', paddingRight: '2rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} 
             />

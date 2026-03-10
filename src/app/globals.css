@@ -50,15 +50,67 @@ button {
 
 .sidebar {
   width: 400px;
-  min-width: 400px; /* Force minimum width */
-  flex-shrink: 0;   /* Prevent shrinking in flex container */
+  min-width: 400px;
+  flex-shrink: 0;
   height: 100vh;
   background-color: var(--white);
   box-shadow: 4px 0 10px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   z-index: 10;
-  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: 155px; /* 기본 Level 1 상태 */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: auto;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+    transform: none;
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .map-container {
+    height: 100vh !important;
+    width: 100vw;
+  }
+
+  .mobile-handle {
+    display: flex !important;
+    justify-content: center;
+    padding: 12px 0 4px 0; /* 하단 패딩을 줄여서 타이틀과 더 가깝게 */
+    cursor: pointer;
+    touch-action: none; /* 드래그 중 스크롤 방지 */
+  }
+
+  .handle-bar {
+    width: 40px;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+  }
+  
+  .custom-zoom-control {
+    bottom: calc(var(--sidebar-visible-height, 28px) + 1.5rem) !important;
+    right: 1rem !important;
+    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.mobile-handle {
+  display: none;
 }
 
 .itinerary-item {
@@ -164,4 +216,30 @@ button {
 .animate-spin {
   animation: spin 1s linear infinite;
   display: block;
+}
+
+/* Leaflet Attribution Style */
+.leaflet-control-attribution {
+  font-size: 11px !important; /* 데스크톱 기본 크기 복구 */
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: var(--text-muted) !important;
+}
+
+.leaflet-control-attribution a {
+  color: #0078A8 !important; /* 링크 기본 파란색 복구 */
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .leaflet-control-attribution {
+    font-size: 8px !important; /* 모바일에서만 축소 */
+    margin-bottom: var(--sidebar-visible-height, 28px) !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    padding-right: 10px !important;
+    transition: margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .leaflet-control-attribution a {
+    color: var(--text-muted) !important; /* 모바일에서는 무채색 유지 */
+  }
 }

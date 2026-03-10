@@ -14,6 +14,7 @@ export default function Home() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [legs, setLegs] = useState<Leg[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [sidebarLevel, setSidebarLevel] = useState(1); // 기본값: 1 (서치바 노출)
 
   useEffect(() => {
     const savedStops = localStorage.getItem('voyage_stops');
@@ -107,8 +108,10 @@ export default function Home() {
         onReorderStops={handleReorderStops}
         onClearAll={handleClearAll}
         onToggleTripType={handleToggleTripType}
+        level={sidebarLevel}
+        onLevelChange={setSidebarLevel}
       />
-      <MapView stops={stops} legs={legs} />
+      <MapView stops={stops} legs={legs} level={sidebarLevel} />
     </main>
   );
 }

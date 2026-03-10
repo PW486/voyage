@@ -11,6 +11,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 interface MapViewProps {
   stops: Stop[];
   legs: Leg[];
+  level?: number;
 }
 
 if (typeof window !== 'undefined') {
@@ -21,21 +22,48 @@ if (typeof window !== 'undefined') {
   });
 }
 
-function MapContent({ stops, legs }: MapViewProps) {
+function MapContent({ stops, legs, level = 1 }: MapViewProps) {
   const map = useMap();
+
+  const getBottomPadding = (lvl: number) => {
+    if (typeof window === 'undefined' || window.innerWidth > 768) return 50;
+    switch (lvl) {
+      case 0: return 60;
+      case 1: return 180;
+      case 2: return window.innerHeight * 0.7 + 20;
+      default: return 50;
+    }
+  };
 
   const stopsKey = useMemo(() => stops.map(s => `${s.id}-${s.lat}-${s.lng}`).join('|'), [stops]);
 
   useEffect(() => {
     if (stops.length === 0) return;
     
+    const bottomPadding = getBottomPadding(level);
+    const sidePadding = 40;
+    const topPadding = 60;
+
     if (stops.length === 1) {
-      map.setView([stops[0].lat, stops[0].lng], 12, { animate: true });
+      const targetPoint = L.latLng(stops[0].lat, stops[0].lng);
+      map.setView(targetPoint, 12, { animate: true });
+      
+      if (window.innerWidth <= 768) {
+        // Offset center to account for bottom sheet
+        const point = map.project(targetPoint, 12);
+        const newPoint = L.point(point.x, point.y + (bottomPadding / 2.5));
+        const newLatLng = map.unproject(newPoint, 12);
+        map.panTo(newLatLng, { animate: true });
+      }
     } else {
       const bounds = L.latLngBounds(stops.map(s => [s.lat, s.lng]));
-      map.fitBounds(bounds, { padding: [80, 80], animate: true });
+      map.fitBounds(bounds, { 
+        paddingTopLeft: [sidePadding, topPadding], 
+        paddingBottomRight: [sidePadding, bottomPadding],
+        animate: true 
+      });
     }
-  }, [stopsKey, map, stops]);
+  }, [stopsKey, map, stops, level]);
 
   const getTransportIconMarkup = (mode: TransportMode) => {
     const icons = {
@@ -134,8 +162,10 @@ export default function MapView(props: MapViewProps) {
         center={[40.7128, -74.0060]} 
         zoom={11} 
         scrollWheelZoom={true} 
+        touchZoom={true}
         zoomControl={false} 
         doubleClickZoom={false}
+        zoomSnap={1}
         style={{ height: '100%', width: '100%' }}
       >
         <MapContent {...props} />
