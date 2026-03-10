@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   authors: [{ name: "PW486" }],
   icons: {
     icon: "/favicon.png",
+    shortcut: "/favicon.png",
     apple: "/apple-icon.png",
   },
   appleWebApp: {
@@ -31,11 +32,13 @@ export const metadata: Metadata = {
     description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
     type: "website",
     siteName: "Bon Voyage!",
+    images: ["/opengraph-image.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bon Voyage!",
     description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
+    images: ["/opengraph-image.png"],
   },
 };
 

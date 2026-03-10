@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { Stop, Leg, TransportMode } from '@/types';
 import { MapPin, Plane, Train, Car, Bus, Footprints, Plus, Search, Trash2, Loader2, Ship, Bike, RotateCcw, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -47,7 +46,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     }
   }, [isMobile, isFocused]);
 
-  // Touch Drag State
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
@@ -68,7 +66,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     if (!isDragging) return;
     setIsDragging(false);
     
-    // Snapping Logic
     if (Math.abs(dragY) > 50) {
       if (dragY < -50 && level < 2) {
         onLevelChange(level + 1);
@@ -201,7 +198,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Image src="/logo.png" alt="Logo" width={isMobile ? 24 : 32} height={isMobile ? 24 : 32} style={{ objectFit: 'contain' }} />
+            <img src="/logo.png" alt="Logo" style={{ width: isMobile ? '24px' : '32px', height: 'auto', display: 'block' }} />
             <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage!</h1>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
