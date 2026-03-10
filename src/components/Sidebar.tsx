@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Stop, Leg, TransportMode } from '@/types';
 import { MapPin, Plane, Train, Car, Bus, Footprints, Plus, Search, Trash2, Loader2, Ship, Bike, RotateCcw, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -27,10 +28,24 @@ interface SearchResult {
 }
 
 export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType, level, onLevelChange }: SidebarProps) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  const searchInputRef = useCallback((node: HTMLInputElement | null) => {
+    if (node && isMobile && isFocused) {
+      node.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, [isMobile, isFocused]);
 
   // Touch Drag State
   const [dragY, setDragY] = useState(0);
@@ -54,7 +69,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     setIsDragging(false);
     
     // Snapping Logic
-    // If dragged enough (50px), move to next/prev level
     if (Math.abs(dragY) > 50) {
       if (dragY < -50 && level < 2) {
         onLevelChange(level + 1);
@@ -111,8 +125,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     onAddStop({ id: Math.random().toString(36).substr(2, 9), name: res.name, lat: res.lat, lng: res.lng });
     setSearchTerm('');
     setResults([]);
-    // On mobile, if a stop is added, maybe keep sidebar open or closed? 
-    // Let's keep it open for now.
   };
 
   const getTransportIcon = useCallback((mode: TransportMode) => {
@@ -128,14 +140,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     }
   }, []);
 
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   useEffect(() => {
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
@@ -147,9 +151,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         }
       };
       const h = getVisibleHeight(level);
-      // Synchronize CSS variable exactly with the sidebar's visible edge
       document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
-
     } else {
       document.documentElement.style.removeProperty('--sidebar-visible-height');
     }
@@ -199,7 +201,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: isMobile ? '24px' : '32px', height: 'auto' }} />
+            <Image src="/logo.png" alt="Logo" width={isMobile ? 24 : 32} height={isMobile ? 24 : 32} style={{ objectFit: 'contain' }} />
             <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage!</h1>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', minWidth: '85px', justifyContent: 'flex-end' }}>
@@ -231,6 +233,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '12px', padding: '0 0.75rem' }}>
             {isLoading ? <Loader2 size={18} className="animate-spin" color="var(--text-muted)" /> : <Search size={18} color="var(--text-muted)" />}
             <input 
+              ref={searchInputRef}
               type="text" 
               placeholder="Add a destination..." 
               value={searchTerm} 
