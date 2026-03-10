@@ -28,9 +28,9 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
   const getBottomPadding = (lvl: number) => {
     if (typeof window === 'undefined' || window.innerWidth > 768) return 50;
     switch (lvl) {
-      case 0: return 80;
-      case 1: return 200;
-      case 2: return window.innerHeight * 0.7 + 50; // Keep this as pixel calculation since fitBounds needs numbers
+      case 0: return 60; // 28px + safety area + margin
+      case 1: return 180; // 137px + margin
+      case 2: return window.innerHeight * 0.7 + 20; // 70svh + margin
       default: return 50;
     }
   };
@@ -49,7 +49,6 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
       map.setView(targetPoint, 12, { animate: true });
       
       if (window.innerWidth <= 768) {
-        // Offset center to account for bottom sheet
         const point = map.project(targetPoint, 12);
         const newPoint = L.point(point.x, point.y + (bottomPadding / 2.5));
         const newLatLng = map.unproject(newPoint, 12);

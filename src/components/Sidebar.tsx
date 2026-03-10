@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Stop, Leg, TransportMode } from '@/types';
 import { MapPin, Plane, Train, Car, Bus, Footprints, Plus, Search, Trash2, Loader2, Ship, Bike, RotateCcw, GripVertical } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -26,7 +27,19 @@ interface SearchResult {
   lng: number;
 }
 
-export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType, level, onLevelChange }: SidebarProps) {
+export default function Sidebar({ 
+  stops, 
+  legs, 
+  onAddStop, 
+  onRemoveStop, 
+  onUpdateLegMode, 
+  onReorderStops, 
+  onClearAll, 
+  onToggleTripType, 
+  level, 
+  onLevelChange 
+}: SidebarProps) {
+  const [isMobile, setIsMobile] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +49,39 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   const [dragY, setDragY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
+
+  // Sync isMobile state
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Update CSS variable for map controls positioning
+  useEffect(() => {
+    if (isMobile) {
+      const getVisibleHeight = (lvl: number) => {
+        switch (lvl) {
+          case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
+          case 1: return '137px';
+          case 2: return '70svh';
+          default: return '137px';
+        }
+      };
+      const h = getVisibleHeight(level);
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
+    } else {
+      document.documentElement.style.removeProperty('--sidebar-visible-height');
+    }
+  }, [level, dragY, isMobile]);
+
+  // Handle instant scroll on search focus
+  const searchInputRef = useCallback((node: HTMLInputElement | null) => {
+    if (node && isMobile && isFocused) {
+      node.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, [isMobile, isFocused]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setStartY(e.touches[0].clientY);
@@ -54,7 +100,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     setIsDragging(false);
     
     // Snapping Logic
-    // If dragged enough (50px), move to next/prev level
     if (Math.abs(dragY) > 50) {
       if (dragY < -50 && level < 2) {
         onLevelChange(level + 1);
@@ -111,8 +156,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     onAddStop({ id: Math.random().toString(36).substr(2, 9), name: res.name, lat: res.lat, lng: res.lng });
     setSearchTerm('');
     setResults([]);
-    // On mobile, if a stop is added, maybe keep sidebar open or closed? 
-    // Let's keep it open for now.
   };
 
   const getTransportIcon = useCallback((mode: TransportMode) => {
@@ -127,33 +170,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       case 'WALK': return <Footprints size={size} />;
     }
   }, []);
-
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    if (isMobile) {
-      const getVisibleHeight = (lvl: number) => {
-        switch (lvl) {
-          case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
-          case 1: return '137px';
-          case 2: return '70svh';
-          default: return '137px';
-        }
-      };
-      const h = getVisibleHeight(level);
-      // Synchronize CSS variable exactly with the sidebar's visible edge
-      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
-
-    } else {
-      document.documentElement.style.removeProperty('--sidebar-visible-height');
-    }
-  }, [level, dragY, isMobile]);
 
   const modes: TransportMode[] = ['PLANE', 'TRAIN', 'BUS', 'FERRY', 'CAR', 'BIKE', 'WALK'];
 
@@ -199,7 +215,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <img src="/voyage/logo.png" alt="Logo" style={{ width: isMobile ? '20px' : '28px', height: 'auto' }} />
+            <Image src="/voyage/logo.png" alt="Logo" width={isMobile ? 20 : 28} height={isMobile ? 20 : 28} style={{ objectFit: 'contain' }} />
             <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage!</h1>
           </div>
 
@@ -232,6 +248,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '12px', padding: '0 0.75rem' }}>
             {isLoading ? <Loader2 size={18} className="animate-spin" color="var(--text-muted)" /> : <Search size={18} color="var(--text-muted)" />}
             <input 
+              ref={searchInputRef}
               type="text" 
               placeholder="Add a destination..." 
               value={searchTerm} 
