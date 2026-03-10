@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Bon Voyage",
-  description: "Simple Travel Itinerary Planner",
-  keywords: ["travel", "itinerary", "planner", "trip", "voyage", "map", "navigation"],
+  description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
+  keywords: ["travel planner", "itinerary builder", "trip organizer", "voyage", "interactive map", "route planner"],
   authors: [{ name: "PW486" }],
   icons: {
     icon: "/favicon.png",
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Bon Voyage",
-    description: "Simple Travel Itinerary Planner",
+    description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
     type: "website",
     siteName: "Bon Voyage",
   },
   twitter: {
     card: "summary_large_image",
     title: "Bon Voyage",
-    description: "Simple Travel Itinerary Planner",
+    description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
   },
 };
 
