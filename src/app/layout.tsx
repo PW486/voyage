@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     title: "Voyage",
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     capable: true,
   },
   openGraph: {

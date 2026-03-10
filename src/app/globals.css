@@ -37,6 +37,7 @@ main {
   overflow: hidden;
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  padding-top: env(safe-area-inset-top); /* Added to protect the clock area */
 }
 
 a {
