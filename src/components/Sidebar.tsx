@@ -157,23 +157,27 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
   const modes: TransportMode[] = ['PLANE', 'TRAIN', 'BUS', 'FERRY', 'CAR', 'BIKE', 'WALK'];
 
   const getLevelHeight = (lvl: number) => {
+    if (typeof window === 'undefined') return 160;
     switch (lvl) {
       case 0: return 28;
       case 1: return 160;
       case 2: return Math.floor(window.innerHeight * 0.7);
-      default: return 28;
+      default: return 160;
     }
   };
+
+  const currentHeight = isMobile ? getLevelHeight(level) - dragY : '100%';
 
   return (
     <div 
       className={`sidebar level-${level}`}
       style={isMobile ? {
         transform: 'none',
-        height: `calc(${getLevelHeight(level) - dragY}px + env(safe-area-inset-bottom, 0px))`,
+        height: `calc(${currentHeight}px + env(safe-area-inset-bottom, 0px))`,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         bottom: 0,
-        top: 'auto'
+        top: 'auto',
+        display: 'flex' 
       } : {}}
     >
       <div 
