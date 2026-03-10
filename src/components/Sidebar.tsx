@@ -140,15 +140,15 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
         switch (lvl) {
-          case 0: return '28px';
+          case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
           case 1: return '137px';
           case 2: return '70svh';
           default: return '137px';
         }
       };
       const h = getVisibleHeight(level);
-      // Sync the CSS variable with the total physical height of the sidebar
-      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px + env(safe-area-inset-bottom, 0px))`);
+      // Synchronize CSS variable exactly with the sidebar's visible edge
+      document.documentElement.style.setProperty('--sidebar-visible-height', `calc(${h} - ${dragY}px)`);
 
     } else {
       document.documentElement.style.removeProperty('--sidebar-visible-height');
@@ -159,7 +159,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
 
   const getLevelHeightString = (lvl: number) => {
     switch (lvl) {
-      case 0: return '28px';
+      case 0: return 'calc(28px + env(safe-area-inset-bottom, 0px))';
       case 1: return '137px';
       case 2: return '70svh';
       default: return '137px';
