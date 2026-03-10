@@ -23,24 +23,25 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   appleWebApp: {
-    title: "Voyage",
-    statusBarStyle: "default",
-    capable: true,
-  },
-  openGraph: {
-    title: "Bon Voyage!",
-    description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
-    type: "website",
-    siteName: "Bon Voyage!",
-    images: ["/opengraph-image.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Bon Voyage!",
-    description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
-    images: ["/opengraph-image.png"],
-  },
-};
+    icons: {
+      icon: "/voyage/favicon.png",
+      shortcut: "/voyage/favicon.png",
+      apple: "/voyage/apple-icon.png",
+    },
+    ...
+    openGraph: {
+      title: "Bon Voyage!",
+      description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
+      type: "website",
+      siteName: "Bon Voyage!",
+      images: ["/voyage/opengraph-image.png"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Bon Voyage!",
+      description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
+      images: ["/voyage/opengraph-image.png"],
+    },
 
 export const viewport: Viewport = {
   width: "device-width",

@@ -199,7 +199,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
       <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: isMobile ? '24px' : '32px', height: 'auto' }} />
+            <img src="/voyage/logo.png" alt="Logo" style={{ width: isMobile ? '24px' : '32px', height: 'auto' }} />
             <h1 style={{ color: 'var(--primary-navy)', fontSize: isMobile ? '1.25rem' : '1.5rem', margin: 0 }}>Bon Voyage!</h1>
           </div>
 
