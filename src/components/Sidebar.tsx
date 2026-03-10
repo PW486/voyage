@@ -142,7 +142,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
         switch (lvl) {
           case 0: return '28px';
           case 1: return '160px';
-          case 2: return '70vh';
+          case 2: return '70svh';
           default: return '160px';
         }
       };
@@ -160,21 +160,25 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     switch (lvl) {
       case 0: return '28px';
       case 1: return '160px';
-      case 2: return '70vh';
+      case 2: return '70svh';
       default: return '160px';
     }
   };
+
+  const currentHeight = isMobile ? getLevelHeightString(level) : '100%';
 
   return (
     <div 
       className={`sidebar level-${level}`}
       style={isMobile ? {
         transform: 'none',
-        height: `calc(${getLevelHeightString(level)} - ${dragY}px + env(safe-area-inset-bottom, 0px))`,
+        height: `calc(${currentHeight} ${isMobile && level < 2 ? `- ${dragY}px` : ''} + env(safe-area-inset-bottom, 0px))`,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         bottom: 0,
         top: 'auto',
-        display: 'flex' 
+        display: 'flex',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)'
       } : {}}
     >
       <div 

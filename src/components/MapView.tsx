@@ -30,7 +30,7 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
     switch (lvl) {
       case 0: return 80;
       case 1: return 200;
-      case 2: return window.innerHeight * 0.7 + 50;
+      case 2: return window.innerHeight * 0.7 + 50; // Keep this as pixel calculation since fitBounds needs numbers
       default: return 50;
     }
   };

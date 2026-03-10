@@ -31,11 +31,13 @@ body {
 main {
   width: 100%;
   height: 100%;
-  height: 100vh;
   height: 100svh;
   display: flex;
   position: relative;
   overflow: hidden;
+  /* Respect landscape safe areas on desktop/large screens if needed */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 a {
@@ -50,6 +52,13 @@ button {
   font-family: inherit;
   color: inherit;
   outline: none;
+}
+
+/* Leaflet styles override */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
 }
 
 .map-container {
@@ -76,6 +85,8 @@ button {
 @media (max-width: 768px) {
   main {
     flex-direction: column;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .sidebar {
@@ -90,9 +101,12 @@ button {
     background-color: var(--white);
     display: flex;
     flex-direction: column;
-    z-index: 2000; /* Ensure it is above the map and all its controls */
+    z-index: 2000;
     transform: none;
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Safe area support for landscape and home bar */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 
@@ -101,13 +115,12 @@ button {
     width: 100%;
   }
 
-
   .mobile-handle {
     display: flex !important;
     justify-content: center;
-    padding: 12px 0 4px 0; /* Reduce bottom padding to bring it closer to title */
+    padding: 12px 0 4px 0;
     cursor: pointer;
-    touch-action: none; /* Prevent scroll during drag */
+    touch-action: none;
   }
 
   .handle-bar {
@@ -119,7 +132,7 @@ button {
   
   .custom-zoom-control {
     bottom: calc(var(--sidebar-visible-height, 28px) + 1rem) !important;
-    right: 1rem !important;
+    right: calc(1rem + env(safe-area-inset-right)) !important;
     transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
@@ -130,7 +143,6 @@ button {
 
 .itinerary-item {
   position: relative;
-  /* Removed border-bottom from here to prevent "strange lines" */
 }
 
 .transport-connector {
@@ -235,13 +247,13 @@ button {
 
 /* Leaflet Attribution Style */
 .leaflet-control-attribution {
-  font-size: 11px !important; /* Restore default desktop size */
+  font-size: 11px !important;
   background: rgba(255, 255, 255, 0.7) !important;
   color: var(--text-muted) !important;
 }
 
 .leaflet-control-attribution a {
-  color: #0078A8 !important; /* Restore default link blue */
+  color: #0078A8 !important;
   text-decoration: none;
 }
 
@@ -249,12 +261,13 @@ button {
   .leaflet-control-attribution {
     font-size: 8px !important;
     margin-bottom: var(--sidebar-visible-height, 28px) !important;
+    margin-right: env(safe-area-inset-right) !important;
     background: rgba(255, 255, 255, 0.3) !important;
     padding-right: 10px !important;
     transition: margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .leaflet-control-attribution a {
-    color: var(--text-muted) !important; /* Neutral color on mobile */
+    color: var(--text-muted) !important;
   }
 }
