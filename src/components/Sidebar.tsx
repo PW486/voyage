@@ -226,7 +226,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               onChange={(e) => setSearchTerm(e.target.value)} 
               onFocus={() => {
                 setIsFocused(true);
-                if (level < 2 && isMobile) onLevelChange(2); // 서치바 클릭 시 전체 확장
+                if (level < 2 && isMobile) onLevelChange(2); // Expand to full level on search focus
               }}
               onBlur={() => setTimeout(() => setIsFocused(false), 200)}
               style={{ width: '100%', padding: '0.75rem', paddingRight: '2rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} 

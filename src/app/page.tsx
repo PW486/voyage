@@ -14,7 +14,7 @@ export default function Home() {
   const [stops, setStops] = useState<Stop[]>([]);
   const [legs, setLegs] = useState<Leg[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [sidebarLevel, setSidebarLevel] = useState(1); // 기본값: 1 (서치바 노출)
+  const [sidebarLevel, setSidebarLevel] = useState(1); // Default: 1 (Search bar visible)
 
   useEffect(() => {
     const savedStops = localStorage.getItem('voyage_stops');

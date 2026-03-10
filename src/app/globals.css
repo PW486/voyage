@@ -71,7 +71,7 @@ button {
   .sidebar {
     width: 100%;
     min-width: 100%;
-    height: 155px; /* 기본 Level 1 상태 */
+    height: 155px; /* Default Level 1 state */
     position: absolute;
     bottom: 0;
     left: 0;
@@ -90,9 +90,9 @@ button {
   .mobile-handle {
     display: flex !important;
     justify-content: center;
-    padding: 12px 0 4px 0; /* 하단 패딩을 줄여서 타이틀과 더 가깝게 */
+    padding: 12px 0 4px 0; /* Reduce bottom padding to bring it closer to title */
     cursor: pointer;
-    touch-action: none; /* 드래그 중 스크롤 방지 */
+    touch-action: none; /* Prevent scroll during drag */
   }
 
   .handle-bar {
@@ -220,19 +220,19 @@ button {
 
 /* Leaflet Attribution Style */
 .leaflet-control-attribution {
-  font-size: 11px !important; /* 데스크톱 기본 크기 복구 */
+  font-size: 11px !important; /* Restore default desktop size */
   background: rgba(255, 255, 255, 0.7) !important;
   color: var(--text-muted) !important;
 }
 
 .leaflet-control-attribution a {
-  color: #0078A8 !important; /* 링크 기본 파란색 복구 */
+  color: #0078A8 !important; /* Restore default link blue */
   text-decoration: none;
 }
 
 @media (max-width: 768px) {
   .leaflet-control-attribution {
-    font-size: 8px !important; /* 모바일에서만 축소 */
+    font-size: 8px !important; /* Minimized on mobile */
     margin-bottom: var(--sidebar-visible-height, 28px) !important;
     background: rgba(255, 255, 255, 0.3) !important;
     padding-right: 10px !important;
@@ -240,6 +240,6 @@ button {
   }
 
   .leaflet-control-attribution a {
-    color: var(--text-muted) !important; /* 모바일에서는 무채색 유지 */
+    color: var(--text-muted) !important; /* Neutral color on mobile */
   }
 }
