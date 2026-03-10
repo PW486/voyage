@@ -27,10 +27,23 @@ interface SearchResult {
 }
 
 export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType, level, onLevelChange }: SidebarProps) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const searchInputRef = useCallback((node: HTMLInputElement | null) => {
+    if (node && isMobile && isFocused) {
+      node.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+  }, [isMobile, isFocused]);
 
   // Touch Drag State
   const [dragY, setDragY] = useState(0);
@@ -128,14 +141,6 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     }
   }, []);
 
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   useEffect(() => {
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
@@ -227,6 +232,7 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
           <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '12px', padding: '0 0.75rem' }}>
             {isLoading ? <Loader2 size={18} className="animate-spin" color="var(--text-muted)" /> : <Search size={18} color="var(--text-muted)" />}
             <input 
+              ref={searchInputRef}
               type="text" 
               placeholder="Add a destination..." 
               value={searchTerm} 
