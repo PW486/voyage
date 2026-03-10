@@ -157,6 +157,14 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     }
   }, []);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
