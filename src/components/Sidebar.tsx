@@ -27,6 +27,35 @@ interface SearchResult {
 }
 
 export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdateLegMode, onReorderStops, onClearAll, onToggleTripType, level, onLevelChange }: SidebarProps) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(0);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height);
+      }
+    };
+
+    window.addEventListener('resize', checkMobile);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
+      setViewportHeight(window.visualViewport.height);
+    }
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+        window.visualViewport.removeEventListener('scroll', handleViewportChange);
+      }
+    };
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,7 +189,11 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
     switch (lvl) {
       case 0: return '28px';
       case 1: return '137px';
-      case 2: return '70svh';
+      case 2: 
+        if (isMobile && viewportHeight > 0 && viewportHeight < window.innerHeight * 0.8) {
+          return `${Math.floor(viewportHeight * 0.9)}px`;
+        }
+        return '70svh';
       default: return '137px';
     }
   };
