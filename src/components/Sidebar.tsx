@@ -231,14 +231,27 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               onChange={(e) => setSearchTerm(e.target.value)} 
               onFocus={() => {
                 setIsFocused(true);
-                if (level < 2 && isMobile) onLevelChange(2); // Expand to full level on search focus
+                // On mobile, ensure we go to level 2 smoothly
+                if (isMobile && level < 2) {
+                  onLevelChange(2);
+                }
               }}
-              onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+              onBlur={() => {
+                // Only hide results on desktop automatically
+                // On mobile, we want to keep them visible until a selection or manual close
+                if (!isMobile) {
+                  setTimeout(() => setIsFocused(false), 200);
+                }
+              }}
               style={{ width: '100%', padding: '0.75rem', paddingRight: '2rem', background: 'transparent', border: 'none', outline: 'none', fontSize: '1rem' }} 
             />
-            {searchTerm && (
+            {(searchTerm || (isMobile && isFocused)) && (
               <button 
-                onClick={() => setSearchTerm('')} 
+                onClick={() => {
+                  setSearchTerm('');
+                  setResults([]);
+                  setIsFocused(false);
+                }} 
                 style={{ 
                   position: 'absolute', 
                   right: '0.75rem', 
@@ -253,18 +266,29 @@ export default function Sidebar({ stops, legs, onAddStop, onRemoveStop, onUpdate
               </button>
             )}
           </div>
-          {isFocused && results.length > 0 && (
+          {isFocused && (results.length > 0 || isLoading) && (
             <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: 'white', border: '1px solid #eee', borderRadius: '12px', marginTop: '0.5rem', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', zIndex: 100 }}>
-              {results.map(res => (
-                <button key={res.id} onClick={() => handleAddStop(res)} style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}>
-                  <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px' }}><MapPin size={16} color="var(--primary-navy)" /></div>
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{res.name}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.context}</span>
-                  </div>
-                  <Plus size={14} color="#cbd5e1" />
-                </button>
-              ))}
+              {isLoading ? (
+                <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}><Loader2 size={20} className="animate-spin" style={{ margin: '0 auto' }} /></div>
+              ) : (
+                results.map(res => (
+                  <button 
+                    key={res.id} 
+                    onClick={() => {
+                      handleAddStop(res);
+                      setIsFocused(false); // Hide results after selection
+                    }} 
+                    style={{ width: '100%', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', textAlign: 'left', borderBottom: '1px solid #f8f9fa' }}
+                  >
+                    <div style={{ background: '#f1f5f9', padding: '0.5rem', borderRadius: '8px' }}><MapPin size={16} color="var(--primary-navy)" /></div>
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{res.name}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{res.context}</span>
+                    </div>
+                    <Plus size={14} color="#cbd5e1" />
+                  </button>
+                ))
+              )}
             </div>
           )}
         </div>

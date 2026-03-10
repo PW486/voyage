@@ -48,6 +48,7 @@ button {
   border: none;
   background: none;
   font-family: inherit;
+  color: inherit;
   outline: none;
 }
 
@@ -117,7 +118,7 @@ button {
   }
   
   .custom-zoom-control {
-    bottom: calc(var(--sidebar-visible-height, 28px) + env(safe-area-inset-bottom, 20px) + 1.5rem) !important;
+    bottom: calc(var(--sidebar-visible-height, 28px) + 1.5rem) !important;
     right: 1rem !important;
     transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -246,8 +247,8 @@ button {
 
 @media (max-width: 768px) {
   .leaflet-control-attribution {
-    font-size: 8px !important; /* Minimized on mobile */
-    margin-bottom: calc(var(--sidebar-visible-height, 28px) + env(safe-area-inset-bottom, 20px)) !important;
+    font-size: 8px !important;
+    margin-bottom: var(--sidebar-visible-height, 28px) !important;
     background: rgba(255, 255, 255, 0.3) !important;
     padding-right: 10px !important;
     transition: margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
