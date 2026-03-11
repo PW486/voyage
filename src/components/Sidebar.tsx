@@ -213,7 +213,7 @@ export default function Sidebar({
       <div style={{ padding: isMobile ? '0rem 1.25rem 1.25rem 1.25rem' : '2rem 1.5rem 2rem 1.5rem', borderBottom: '1px solid #eee' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isMobile ? '0.5rem' : '1.5rem', minHeight: '38px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Image src="/voyage/logo.png" alt="Logo" width={isMobile ? 20 : 28} height={isMobile ? 20 : 28} style={{ objectFit: 'contain' }} />
+            <Image src="/voyage/logo.png" alt="Logo" width={isMobile ? 22 : 25} height={isMobile ? 22 : 25} style={{ objectFit: 'contain' }} />
             <h1 style={{ 
               color: 'var(--primary-navy)', 
               fontSize: isMobile ? '1.5rem' : '1.75rem', 
