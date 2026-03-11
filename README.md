@@ -1,4 +1,4 @@
-# Bon Voyage ✈️
+# Bon Voyage! ✈️
 
 Minimalist travel itinerary planner with interactive mapping.
 
@@ -16,7 +16,7 @@ npm run dev
 ```
 
 ## Tech Stack
-Next.js, Leaflet, @hello-pangea/dnd, Lucide React.
+Next.js, Leaflet, Lucide React.
 
 ---
 *Plan your journey at [pw486.github.io/voyage](https://pw486.github.io/voyage)*
