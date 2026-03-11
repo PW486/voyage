@@ -20,7 +20,7 @@ const lobsterTwo = Lobster_Two({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://pw486.github.io/voyage"),
+  metadataBase: new URL("https://pw486.github.io"),
   title: "Bon Voyage!",
   description: "Map your next adventure with Bon Voyage. A minimalist and intuitive travel itinerary planner designed to help you visualize stops, choose transport modes, and organize your perfect journey effortlessly.",
   keywords: ["travel planner", "itinerary builder", "trip organizer", "voyage", "interactive map", "route planner"],
