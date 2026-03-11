@@ -28,10 +28,9 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
   const getBottomPadding = (lvl: number) => {
     if (typeof window === 'undefined' || window.innerWidth > 768) return 50;
     switch (lvl) {
-      case 0: return 60; // 28px + safety area + margin
       case 1: return 180; // 137px + margin
       case 2: return window.innerHeight * 0.7 + 20; // 70svh + margin
-      default: return 50;
+      default: return 180;
     }
   };
 
