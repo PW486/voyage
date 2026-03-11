@@ -187,7 +187,7 @@ export default function Sidebar({
       className={`sidebar level-${level}`}
       style={isMobile ? {
         transform: 'none',
-        height: isMobile && level < 2 ? `calc(${currentHeight} - ${dragY}px)` : currentHeight,
+        height: isMobile ? `calc(${currentHeight} - ${dragY}px)` : currentHeight,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         bottom: 0,
         top: 'auto',
