@@ -96,7 +96,7 @@ button {
     z-index: 2000;
     transform: none;
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-bottom: env(safe-area-inset-bottom, 20px);
+    padding-bottom: 0;
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     overflow: hidden;
