@@ -63,7 +63,6 @@ export default function Sidebar({
     if (isMobile) {
       const getVisibleHeight = (lvl: number) => {
         switch (lvl) {
-          case 0: return '28px';
           case 1: return '137px';
           case 2: return '70svh';
           default: return '137px';
@@ -103,7 +102,7 @@ export default function Sidebar({
     if (Math.abs(dragY) > 50) {
       if (dragY < -50 && level < 2) {
         onLevelChange(level + 1);
-      } else if (dragY > 50 && level > 0) {
+      } else if (dragY > 50 && level > 1) {
         onLevelChange(level - 1);
       }
     }
@@ -175,7 +174,6 @@ export default function Sidebar({
 
   const getLevelHeightString = (lvl: number) => {
     switch (lvl) {
-      case 0: return '28px';
       case 1: return '137px';
       case 2: return '70svh';
       default: return '137px';
@@ -207,7 +205,7 @@ export default function Sidebar({
           if (level < 2) onLevelChange(level + 1);
           else onLevelChange(1);
         }}
-        style={isMobile ? { height: level === 0 ? '100%' : '28px', minHeight: '28px' } : {}}
+        style={isMobile ? { height: '28px', minHeight: '28px' } : {}}
       >
         <div className="handle-bar" />
       </div>
