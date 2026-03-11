@@ -219,7 +219,6 @@ export default function Sidebar({
               fontSize: isMobile ? '1.5rem' : '1.75rem', 
               margin: 0, 
               fontFamily: 'var(--font-lobster-two), cursive',
-              fontStyle: 'italic',
               fontWeight: 700 
             }}>Bon Voyage!</h1>
           </div>
