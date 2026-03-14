@@ -74,7 +74,7 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
       WALK: <Footprints size={14} />,
     };
     return renderToStaticMarkup(
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', background: 'white', border: '2px solid #334155', borderRadius: '50%', color: '#334155', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', background: 'white', border: '2px solid #334155', borderRadius: '50%', color: '#334155', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', pointerEvents: 'none', cursor: 'default' }}>
         {icons[mode]}
       </div>
     );
@@ -110,7 +110,7 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
 
         return (
           <Fragment key={`leg-group-${idx}-${leg.fromId}-${leg.toId}`}>
-            <Polyline positions={[[from.lat, from.lng], [to.lat, to.lng]]} color="#334155" weight={3} opacity={1} />
+            <Polyline positions={[[from.lat, from.lng], [to.lat, to.lng]]} color="#334155" weight={3} opacity={1} interactive={false} />
             {!leg.isReturn && (
               <Marker 
                 position={midpoint} 

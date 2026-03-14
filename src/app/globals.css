@@ -150,6 +150,15 @@ button {
 .custom-marker-container {
   background: none !important;
   border: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.transport-marker-icon {
+  background: none !important;
+  border: none !important;
+  cursor: default !important;
+  pointer-events: none !important;
 }
 
 .marker-wrapper {
