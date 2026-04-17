@@ -11,24 +11,25 @@ const MapView = dynamic(() => import('@/components/MapView'), {
 });
 
 export default function Home() {
-  const [stops, setStops] = useState<Stop[]>(() => {
-    if (typeof window === 'undefined') return [];
-
-    const savedStops = localStorage.getItem('voyage_stops');
-    return savedStops ? JSON.parse(savedStops) : [];
-  });
-  const [legs, setLegs] = useState<Leg[]>(() => {
-    if (typeof window === 'undefined') return [];
-
-    const savedLegs = localStorage.getItem('voyage_legs');
-    return savedLegs ? JSON.parse(savedLegs) : [];
-  });
-  const [sidebarLevel, setSidebarLevel] = useState(1); // Default: 1 (Search bar visible)
+  const [stops, setStops] = useState<Stop[]>([]);
+  const [legs, setLegs] = useState<Leg[]>([]);
+  const [sidebarLevel, setSidebarLevel] = useState(1);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('voyage_stops', JSON.stringify(stops));
-    localStorage.setItem('voyage_legs', JSON.stringify(legs));
-  }, [stops, legs]);
+    const savedStops = localStorage.getItem('voyage_stops');
+    const savedLegs = localStorage.getItem('voyage_legs');
+    if (savedStops) setStops(JSON.parse(savedStops));
+    if (savedLegs) setLegs(JSON.parse(savedLegs));
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem('voyage_stops', JSON.stringify(stops));
+      localStorage.setItem('voyage_legs', JSON.stringify(legs));
+    }
+  }, [stops, legs, isMounted]);
 
   const handleAddStop = (newStop: Stop) => {
     setStops(prev => {
