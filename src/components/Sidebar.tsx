@@ -27,6 +27,23 @@ interface SearchResult {
   lng: number;
 }
 
+interface PhotonFeature {
+  properties: {
+    osm_id?: string | number;
+    name?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+  geometry: {
+    coordinates: [number, number];
+  };
+}
+
+interface PhotonResponse {
+  features: PhotonFeature[];
+}
+
 export default function Sidebar({ 
   stops, 
   legs, 
@@ -115,8 +132,8 @@ export default function Sidebar({
         setIsLoading(true);
         try {
           const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchTerm)}&limit=10&lang=en`);
-          const data = await response.json();
-          const mappedResults: SearchResult[] = data.features.map((f: any, index: number) => {
+          const data: PhotonResponse = await response.json();
+          const mappedResults: SearchResult[] = data.features.map((f, index: number) => {
             const p = f.properties;
             return {
               id: `${p.osm_id || index}-${index}`,

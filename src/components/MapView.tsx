@@ -25,6 +25,20 @@ if (typeof window !== 'undefined') {
 function MapContent({ stops, legs, level = 1 }: MapViewProps) {
   const map = useMap();
 
+  const getSegmentMidpoint = (from: Stop, to: Stop): [number, number] => {
+    // Average in projected map space so the marker stays centered on the visible line.
+    const crs = map.options.crs ?? L.CRS.EPSG3857;
+    const fromPoint = crs.project(L.latLng(from.lat, from.lng));
+    const toPoint = crs.project(L.latLng(to.lat, to.lng));
+    const midpoint = L.point(
+      (fromPoint.x + toPoint.x) / 2,
+      (fromPoint.y + toPoint.y) / 2
+    );
+    const midpointLatLng = crs.unproject(midpoint);
+
+    return [midpointLatLng.lat, midpointLatLng.lng];
+  };
+
   const getBottomPadding = (lvl: number) => {
     if (typeof window === 'undefined' || window.innerWidth > 768) return 50;
     switch (lvl) {
@@ -106,7 +120,7 @@ function MapContent({ stops, legs, level = 1 }: MapViewProps) {
         const to = stops.find(s => s.id === leg.toId);
         if (!from || !to) return null;
 
-        const midpoint: [number, number] = [(from.lat + to.lat) / 2, (from.lng + to.lng) / 2];
+        const midpoint = getSegmentMidpoint(from, to);
 
         return (
           <Fragment key={`leg-group-${idx}-${leg.fromId}-${leg.toId}`}>
